@@ -1,9 +1,13 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+
+interface BuildingImage {
+  normal: string;
+  glowing: string;
+}
 
 interface BuildingPlacementModalProps {
   onClose: () => void;
@@ -16,29 +20,80 @@ const BuildingPlacementModal: React.FC<BuildingPlacementModalProps> = ({
   onAddBuilding,
   position
 }) => {
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState<BuildingImage | null>(null);
   const [redirectUrl, setRedirectUrl] = useState('');
   const [scale, setScale] = useState(1);
 
   // Predefined building images
-  const buildingImages = [
-    '/newBuildingImages/Sinoss.PNG',
-    '/newBuildingImages/Sinoss(1).PNG',
-    '/newBuildingImages/Sinoss(2).PNG',
-    '/newBuildingImages/Sinoss(3).PNG',
-    '/newBuildingImages/Sinoss(4).PNG',
-    '/newBuildingImages/Sinoss(5).PNG',
-    '/newBuildingImages/Sinoss(6).PNG',
-    '/newBuildingImages/Sinoss(7).PNG',
-    '/newBuildingImages/Sinoss(8).PNG',
-    '/newBuildingImages/Sinoss(9).PNG',
-    '/newBuildingImages/Sinoss(10).PNG',
-    '/newBuildingImages/Sinoss(11).PNG',
-    '/newBuildingImages/Sinoss(12).PNG',
-    '/newBuildingImages/Sinoss(13).PNG',
-    '/newBuildingImages/Sinoss(14).PNG',
-    '/newBuildingImages/Sinoss(15).PNG',
-    '/newBuildingImages/Sinoss(16).PNG'
+  const buildingImages: BuildingImage[] = [
+    {
+      normal: '/buildingImages/building_01.png',
+      glowing: '/buildingImages/glow_building_01.png'
+    },
+    {
+      normal: '/buildingImages/building_02.png',
+      glowing: '/buildingImages/glow_building_02.png'
+    },
+    {
+      normal: '/buildingImages/building_03.png',
+      glowing: '/buildingImages/glow_building_03.png'
+    },
+    {
+      normal: '/buildingImages/building_04.png',
+      glowing: '/buildingImages/glow_building_04.png'
+    },
+    {
+      normal: '/buildingImages/building_05.png',
+      glowing: '/buildingImages/glow_building_05.png'
+    },
+    {
+      normal: '/buildingImages/building_06.png',
+      glowing: '/buildingImages/glow_building_06.png'
+    },
+    {
+      normal: '/buildingImages/building_07.png',
+      glowing: '/buildingImages/glow_building_07.png'
+    },
+    {
+      normal: '/buildingImages/building_08.png',
+      glowing: '/buildingImages/glow_building_08.png'
+    },
+    {
+      normal: '/buildingImages/building_09.png',
+      glowing: '/buildingImages/glow_building_09.png'
+    },
+    {
+      normal: '/buildingImages/building_10.png',
+      glowing: '/buildingImages/glow_building_10.png'
+    },
+    {
+      normal: '/buildingImages/building_11.png',
+      glowing: '/buildingImages/glow_building_11.png'
+    },
+    {
+      normal: '/buildingImages/building_12.png',
+      glowing: '/buildingImages/glow_building_12.png'
+    },
+    {
+      normal: '/buildingImages/building_13.png',
+      glowing: '/buildingImages/glow_building_13.png'
+    },
+    {
+      normal: '/buildingImages/building_14.png',
+      glowing: '/buildingImages/glow_building_14.png'
+    },
+    {
+      normal: '/buildingImages/building_15.png',
+      glowing: '/buildingImages/glow_building_15.png'
+    },
+    {
+      normal: '/buildingImages/building_16.png',
+      glowing: '/buildingImages/glow_building_16.png'
+    },
+    {
+      normal: '/buildingImages/building_17.png',
+      glowing: '/buildingImages/glow_building_17.png'
+    }
   ];
 
   const handleAddBuilding = () => {
@@ -52,7 +107,7 @@ const BuildingPlacementModal: React.FC<BuildingPlacementModalProps> = ({
       return;
     }
 
-    onAddBuilding(selectedImage, redirectUrl, scale);
+    onAddBuilding(selectedImage.normal, redirectUrl, scale);
     onClose();
   };
 
@@ -67,13 +122,20 @@ const BuildingPlacementModal: React.FC<BuildingPlacementModalProps> = ({
             {buildingImages.map((image, index) => (
               <div 
                 key={index} 
-                className={`border-2 rounded cursor-pointer p-1 ${selectedImage === image ? 'border-blue-500' : 'border-gray-200'}`}
+                className={`border-2 rounded cursor-pointer p-1 relative group ${
+                  selectedImage?.normal === image.normal ? 'border-blue-500' : 'border-gray-200'
+                }`}
                 onClick={() => setSelectedImage(image)}
               >
                 <img 
-                  src={image}
+                  src={image.normal}
                   alt={`Building ${index + 1}`}
-                  className="w-full h-auto object-cover aspect-square"
+                  className="w-full h-auto object-cover aspect-square transition-opacity duration-300 group-hover:opacity-0"
+                />
+                <img 
+                  src={image.glowing}
+                  alt={`Building ${index + 1} Glowing`}
+                  className="w-full h-auto object-cover aspect-square absolute top-0 left-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 />
               </div>
             ))}

@@ -24,20 +24,28 @@ const BuildingItem: React.FC<BuildingItemProps> = ({
     }
   };
 
+  // Get the glowing version of the image
+  const getGlowingImageUrl = (normalUrl: string) => {
+    return normalUrl.replace('building_', 'glow_building_');
+  };
+
   // Calculate percentage-based position and size for responsiveness
   const buildingStyle: React.CSSProperties = {
     position: 'absolute',
     left: `${x / window.innerWidth * 100}%`,
     top: `${y / window.innerHeight * 100}%`,
-    width: `${width}px`,  // Remove scale from here
-    height: `${height}px`, // Remove scale from here
+    width: `${width}px`,
+    height: `${height}px`,
     border: isSelected ? '2px solid #4CAF50' : 'none',
     boxShadow: isSelected ? '0 0 15px rgba(76, 175, 80, 0.6)' : 'none',
     zIndex: isSelected ? 10 : 1,
     transformStyle: 'preserve-3d',
     transformOrigin: 'center center',
     perspective: `${perspectiveX}px`,
-    cursor: isAdmin ? 'move' : 'pointer'
+    cursor: isAdmin ? 'move' : 'pointer',
+    padding: 0,
+    margin: 0,
+    overflow: 'hidden'
   };
   
   const imageStyle: React.CSSProperties = {
@@ -47,22 +55,33 @@ const BuildingItem: React.FC<BuildingItemProps> = ({
     transform: `scale(${scale}) rotateX(${rotation}deg) rotateY(${building.rotateY || 0}deg) rotateZ(${building.rotateZ || 0}deg)`, 
     transition: 'transform 0.3s ease-in-out',
     transformStyle: 'preserve-3d',
-    transformOrigin: 'center center'
+    transformOrigin: 'center center',
+    display: 'block'
   };
 
   return (
     <div
-      className={`building ${isAdmin ? 'admin' : ''} ${isSelected ? 'selected' : ''}`}
+      className={`building ${isAdmin ? 'admin' : ''} ${isSelected ? 'selected' : ''} relative group`}
       style={buildingStyle}
       onClick={handleClick}
       data-building-id={id}
     >
-      <img 
-        src={imageUrl} 
-        alt="Building" 
-        style={imageStyle}
-        draggable={false}
-      />
+      <div className="w-full h-full relative">
+        <img 
+          src={imageUrl}
+          alt="Building" 
+          style={imageStyle}
+          draggable={false}
+          className="transition-opacity duration-300 group-hover:opacity-0"
+        />
+        <img 
+          src={getGlowingImageUrl(imageUrl)}
+          alt="Building Glowing" 
+          style={imageStyle}
+          draggable={false}
+          className="absolute top-0 left-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        />
+      </div>
     </div>
   );
 };
