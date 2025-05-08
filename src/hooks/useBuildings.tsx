@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Building, loadBuildings, saveBuildings, loadBackgroundImage, saveBackgroundImage, getLastUpdated } from '../utils/localStorage';
+import { Building } from '../utils/localStorage';
+import { loadBuildings, loadBackgroundImage, getLastUpdated } from '../utils/fileStorage';
 import { toast } from 'sonner';
 
 export const useBuildings = () => {
@@ -17,8 +18,8 @@ export const useBuildings = () => {
   // Poll for updates every 30 seconds in non-admin mode to check for changes
   useEffect(() => {
     if (window.location.pathname !== '/admin-portal') {
-      const interval = setInterval(() => {
-        const currentLastUpdated = getLastUpdated();
+      const interval = setInterval(async () => {
+        const currentLastUpdated = await getLastUpdated();
         if (currentLastUpdated && currentLastUpdated !== lastUpdated) {
           loadData();
         }
@@ -28,11 +29,13 @@ export const useBuildings = () => {
     }
   }, [lastUpdated]);
 
-  const loadData = () => {
+  const loadData = async () => {
     try {
-      const loadedBuildings = loadBuildings();
-      const loadedBackground = loadBackgroundImage();
-      const currentLastUpdated = getLastUpdated();
+      const [loadedBuildings, loadedBackground, currentLastUpdated] = await Promise.all([
+        loadBuildings(),
+        loadBackgroundImage(),
+        getLastUpdated()
+      ]);
       
       setBuildings(loadedBuildings);
       setBackgroundImage(loadedBackground);
@@ -46,18 +49,10 @@ export const useBuildings = () => {
   };
 
   const saveChanges = () => {
-    try {
-      saveBuildings(buildings);
-      saveBackgroundImage(backgroundImage);
-      const currentLastUpdated = new Date().toISOString();
-      setLastUpdated(currentLastUpdated);
-      toast.success('Changes saved successfully');
-      return true;
-    } catch (error) {
-      console.error('Error saving data:', error);
-      toast.error('Failed to save changes');
-      return false;
-    }
+    // In this implementation, we don't save changes directly
+    // Instead, we'll show a message to update the JSON file
+    toast.info('Please update the buildings.json file with the current layout');
+    return true;
   };
 
   const addBuilding = (building: Omit<Building, 'id'>) => {
@@ -93,6 +88,15 @@ export const useBuildings = () => {
   };
 
   const updateBackgroundImage = (url: string) => {
+    // If we have a selected building, update its redirect URL
+    if (selectedBuildingId) {
+      const building = buildings.find(b => b.id === selectedBuildingId);
+      if (building) {
+        updateBuilding(selectedBuildingId, { redirectUrl: url });
+        return;
+      }
+    }
+    // Otherwise, update the background image as before
     setBackgroundImage(url);
   };
 

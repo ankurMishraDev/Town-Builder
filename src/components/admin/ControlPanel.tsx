@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -7,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Building } from '@/utils/localStorage';
 import { 
   RotateCw, Save, Trash2, ArrowUp, ArrowDown, 
-  ArrowLeft, ArrowRight, RefreshCw, Upload
+  ArrowLeft, ArrowRight, RefreshCw, Upload, Copy
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface ControlPanelProps {
   selectedBuilding: Building | null;
@@ -175,6 +175,17 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
     }
   };
 
+  const handleCopyBuildingData = () => {
+    if (selectedBuilding) {
+      const buildingData = JSON.stringify(selectedBuilding, null, 2);
+      navigator.clipboard.writeText(buildingData).then(() => {
+        toast.success('Building data copied to clipboard');
+      }).catch(() => {
+        toast.error('Failed to copy building data');
+      });
+    }
+  };
+
   return (
     <div className="control-panel fixed left-4 top-4 z-10 w-72">
       <div className="mb-4">
@@ -280,23 +291,25 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           
           <div className="flex gap-4 mb-4">
             <div>
-              <Label htmlFor="width" className="mb-1 block">Width</Label>
+              <Label htmlFor="width"  className="mb-1 block">Width</Label>
               <Input
                 id="width"
                 type="number"
                 value={selectedBuilding.width}
                 onChange={(e) => handleWidthChange(e.target.value)}
                 min={10}
+                style={{color: 'black'}}
               />
             </div>
             <div>
-              <Label htmlFor="height" className="mb-1 block">Height</Label>
+              <Label htmlFor="height"  className="mb-1 block">Height</Label>
               <Input
                 id="height"
                 type="number"
                 value={selectedBuilding.height}
                 onChange={(e) => handleHeightChange(e.target.value)}
                 min={10}
+                style={{color: 'black'}}
               />
             </div>
           </div>
@@ -348,6 +361,15 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           </div>
           
           <div className="mt-4 flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleCopyBuildingData}
+              className="flex-1"
+              style={{color: 'black'}}
+            >
+              <Copy size={14} className="mr-1" /> Copy Building Data
+            </Button>
             <Button 
               variant="destructive" 
               size="sm" 
